@@ -28,13 +28,11 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       backgroundColor: const Color(0xFF2E335A),
       body: ListenableBuilder(
-        listenable: widget.viewModel, // Use widget.viewModel
+        listenable: widget.viewModel,
         builder: (context, _) {
-          // Since we are fetching in Splash, we can check if data is null
-          // instead of showing a full-screen loader here
           final weather = widget.viewModel.weather;
           if (weather == null) {
-            return const SizedBox(); // Or a very subtle loading state
+            return const SizedBox();
           }
           return Stack(
             children: [
