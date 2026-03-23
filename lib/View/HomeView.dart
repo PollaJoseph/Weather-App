@@ -7,7 +7,8 @@ import 'package:weather_app/View/SearchView.dart';
 import 'package:weather_app/ViewModel/HomeViewModel.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  final HomeViewModel viewModel;
+  const HomeView({super.key, required this.viewModel});
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -27,25 +28,14 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       backgroundColor: const Color(0xFF2E335A),
       body: ListenableBuilder(
-        listenable: viewModel,
+        listenable: widget.viewModel, // Use widget.viewModel
         builder: (context, _) {
-          if (viewModel.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            );
+          // Since we are fetching in Splash, we can check if data is null
+          // instead of showing a full-screen loader here
+          final weather = widget.viewModel.weather;
+          if (weather == null) {
+            return const SizedBox(); // Or a very subtle loading state
           }
-
-          if (viewModel.errorMessage != null) {
-            return Center(
-              child: Text(
-                viewModel.errorMessage!,
-                style: const TextStyle(color: Colors.white),
-              ),
-            );
-          }
-          final weather = viewModel.weather;
-          if (weather == null) return const SizedBox();
-
           return Stack(
             children: [
               Positioned.fill(
