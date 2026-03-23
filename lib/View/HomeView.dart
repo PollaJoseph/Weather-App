@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:weather_app/Components/WeatherCard.dart';
 import 'package:weather_app/Model/WeatherModel.dart';
 import 'package:weather_app/ViewModel/HomeViewModel.dart';
@@ -41,8 +42,6 @@ class _HomeViewState extends State<HomeView> {
               ),
             );
           }
-
-          // Use 'weather' instead of 'weatherData'
           final weather = viewModel.weather;
           if (weather == null) return const SizedBox();
 
@@ -70,28 +69,25 @@ class _HomeViewState extends State<HomeView> {
                 child: Column(
                   children: [
                     const SizedBox(height: 30),
-                    // Use clean model properties
                     Text(
                       weather.cityName,
-                      style: const TextStyle(
+                      style: GoogleFonts.montserrat(
                         color: Colors.white,
                         fontSize: 34,
-                        fontFamily: 'WeatherFont',
                       ),
                     ),
                     Text(
                       "${weather.tempC.round()}°",
-                      style: const TextStyle(
+                      style: GoogleFonts.inter(
                         color: Colors.white,
-                        fontSize: 96,
-                        fontWeight: FontWeight.w200,
-                        fontFamily: 'WeatherFont',
+                        fontSize: 90,
+                        fontWeight: FontWeight.w100,
                         height: 0.9,
                       ),
                     ),
                     Text(
                       weather.condition,
-                      style: TextStyle(
+                      style: GoogleFonts.montserrat(
                         color: Colors.white.withOpacity(0.6),
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -99,7 +95,10 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     Text(
                       "H:${weather.maxTemp.round()}°  L:${weather.minTemp.round()}°",
-                      style: const TextStyle(color: Colors.white, fontSize: 20),
+                      style: GoogleFonts.montserrat(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
                     ),
 
                     const Spacer(),
@@ -142,14 +141,14 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(horizontal: 32),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "Hourly Forecast",
-                      style: TextStyle(
+                      style: GoogleFonts.montserrat(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
@@ -174,10 +173,8 @@ class _HomeViewState extends State<HomeView> {
                     return WeatherCard(
                       time: hour.time,
                       temperature: hour.tempC.round().toString(),
-                      icon: hour.icon, // This is now "lib/Assets/Icons/..."
+                      icon: hour.icon,
                       isSelected: index == 0,
-                      // Optional: add logic to show rain % if available in your model
-                      chanceOfRain: index == 0 ? "30%" : null,
                     );
                   },
                 ),

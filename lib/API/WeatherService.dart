@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 
 class WeatherService {
-  // Use a private Dio instance with BaseOptions
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: "https://api.weatherapi.com/v1",

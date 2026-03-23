@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class WeatherCard extends StatelessWidget {
   final String time;
@@ -19,12 +20,11 @@ class WeatherCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 75, // Slightly wider for the pill shape
-      height: 160, // Taller to match the UI
+      width: 75,
+      height: 160,
       margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(40),
-        // Use a gradient for the selected state
         gradient: isSelected
             ? const LinearGradient(
                 begin: Alignment.topCenter,
@@ -60,7 +60,7 @@ class WeatherCard extends StatelessWidget {
         children: [
           Text(
             time,
-            style: const TextStyle(
+            style: GoogleFonts.montserrat(
               color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -69,7 +69,7 @@ class WeatherCard extends StatelessWidget {
 
           // Weather Icon + Rain Percent
           SizedBox(
-            height: 65, // Fixed height to keep icons aligned
+            height: 65,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -79,8 +79,8 @@ class WeatherCard extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
                       chanceOfRain!,
-                      style: const TextStyle(
-                        color: Color(0xFF40CBD8), // Teal/Cyan color from image
+                      style: GoogleFonts.montserrat(
+                        color: Color(0xFF40CBD8),
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -92,7 +92,7 @@ class WeatherCard extends StatelessWidget {
 
           Text(
             "$temperature°",
-            style: const TextStyle(
+            style: GoogleFonts.montserrat(
               color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.w400,
