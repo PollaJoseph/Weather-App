@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:weather_app/Components/WeatherCard.dart';
 import 'package:weather_app/Model/WeatherModel.dart';
+import 'package:weather_app/View/SearchView.dart';
 import 'package:weather_app/ViewModel/HomeViewModel.dart';
 
 class HomeView extends StatefulWidget {
@@ -104,6 +105,30 @@ class _HomeViewState extends State<HomeView> {
                     const Spacer(),
                     _buildBottomPanel(weather.hourlyForecast),
                   ],
+                ),
+              ),
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 16.0, right: 20.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SearchView(),
+                          ),
+                        );
+                      },
+                      child: Image.asset(
+                        "lib/Assets/Icons/Search Icon.png",
+                        width: 32,
+                        height: 32,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
