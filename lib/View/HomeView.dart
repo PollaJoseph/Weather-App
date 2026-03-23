@@ -117,7 +117,8 @@ class _HomeViewState extends State<HomeView> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SearchView(),
+                            builder: (context) =>
+                                SearchView(viewModel: viewModel),
                           ),
                         );
                       },

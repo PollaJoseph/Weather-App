@@ -16,11 +16,10 @@ class WeatherModel {
     required this.maxTemp,
     required this.minTemp,
     required this.hourlyForecast,
-    required this.weeklyForecast, // Added to constructor
+    required this.weeklyForecast,
   });
 
   factory WeatherModel.fromJson(Map<String, dynamic> json) {
-    // 1. Declare the forecast list properly
     var forecastList = json['forecast']['forecastday'] as List;
 
     return WeatherModel(
@@ -28,14 +27,11 @@ class WeatherModel {
       tempC: json['current']['temp_c'].toDouble(),
       condition: json['current']['condition']['text'],
       conditionIcon: "https:${json['current']['condition']['icon']}",
-      // 2. Use the declared forecastList
       maxTemp: forecastList[0]['day']['maxtemp_c'].toDouble(),
       minTemp: forecastList[0]['day']['mintemp_c'].toDouble(),
 
-      // Map the 7-day forecast
       weeklyForecast: forecastList.map((e) => DayForecast.fromJson(e)).toList(),
 
-      // Map the hourly forecast for the first day
       hourlyForecast: (forecastList[0]['hour'] as List)
           .map((e) => HourForecast.fromJson(e))
           .toList(),
@@ -43,7 +39,6 @@ class WeatherModel {
   }
 }
 
-// 3. Added the missing DayForecast class
 class DayForecast {
   final String date;
   final double avgTemp;
@@ -53,7 +48,7 @@ class DayForecast {
 
   factory DayForecast.fromJson(Map<String, dynamic> json) {
     return DayForecast(
-      date: json['date'], // Returns "2026-03-23"
+      date: json['date'],
       avgTemp: json['day']['avgtemp_c'].toDouble(),
       icon: "https:${json['day']['condition']['icon']}",
     );
@@ -79,8 +74,8 @@ class HourForecast {
     // 1. Clear / Sunny
     if (code == 1000) {
       return isDay
-          ? "lib/Assets/Icons/Clear Weather.png"
-          : "lib/Assets/Icons/Moon cloud fast wind.png";
+          ? "lib/Assets/Icons/sunny_clear.png"
+          : "lib/Assets/Icons/Moon cloud fast wind.png"; // Clear night
     }
 
     // 2. Cloudy / Mist / Fog
@@ -89,35 +84,36 @@ class HourForecast {
         code == 1009 ||
         code == 1030 ||
         code == 1135) {
-      return "lib/Assets/Icons/Cloud.png";
+      return "lib/Assets/Icons/cloudy_solid.png";
     }
 
-    // 3. Rain (Patchy, Light, Moderate)
-    if (code == 1063 ||
-        code == 1180 ||
-        code == 1183 ||
-        code == 1186 ||
-        code == 1189) {
+    // 3. Light/Patchy Rain
+    if (code == 1063 || code == 1180 || code == 1183 || code == 1240) {
       return isDay
           ? "lib/Assets/Icons/Sun cloud angled rain.png"
           : "lib/Assets/Icons/Moon cloud mid rain.png";
     }
 
-    // 4. Heavy Rain / Torrential Rain
-    if (code == 1192 || code == 1195 || code == 1243 || code == 1246) {
+    // 4. Moderate/Heavy Rain
+    if (code == 1186 ||
+        code == 1189 ||
+        code == 1192 ||
+        code == 1195 ||
+        code == 1243 ||
+        code == 1246) {
       return "lib/Assets/Icons/Sun cloud mid rain.png";
     }
 
-    // 5. Thunderstorms / Bad Weather
+    // 5. Thunderstorms
     if (code == 1087 ||
         code == 1273 ||
         code == 1276 ||
         code == 1279 ||
         code == 1282) {
-      return "lib/Assets/Icons/bad.png";
+      return "lib/Assets/Icons/thunderstorm_heavy.png";
     }
 
-    // 6. Snow / Sleet / Ice Pellets
+    // 6. Snow / Sleet
     if (code == 1066 ||
         code == 1114 ||
         code == 1210 ||
@@ -129,11 +125,12 @@ class HourForecast {
       return "lib/Assets/Icons/snow.png";
     }
 
-    // 7. High Wind / Blustery
+    // 7. Windy
     if (code == 1050 || code == 1053) {
-      return "lib/Assets/Icons/air.png";
+      return "lib/Assets/Icons/wind_breeze.png";
     }
 
+    // 8. Default Fallback
     return "lib/Assets/Icons/Tornado.png";
   }
 }

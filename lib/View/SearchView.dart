@@ -1,112 +1,124 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:weather_app/Components/SearchWeatherCard.dart';
+import 'package:weather_app/ViewModel/HomeViewModel.dart';
 
-class SearchView extends StatelessWidget {
-  const SearchView({super.key});
+class SearchView extends StatefulWidget {
+  final HomeViewModel viewModel;
+  const SearchView({super.key, required this.viewModel});
+
+  @override
+  State<SearchView> createState() => _SearchViewState();
+}
+
+class _SearchViewState extends State<SearchView> {
+  @override
+  void initState() {
+    super.initState();
+    widget.viewModel.fetchSearchPageCities();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF2E335A),
-      body: Stack(
-        children: [
-          // Background Gradient/Image
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF2E335A), Color(0xFF1C1B33)],
+      body: ListenableBuilder(
+        listenable: widget.viewModel,
+        builder: (context, _) {
+          return Stack(
+            children: [
+              // Background Gradient
+              Positioned.fill(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFF2E335A), Color(0xFF1C1B33)],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
 
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  // Custom App Bar
-                  Row(
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Column(
                     children: [
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
+                      // Header
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(
+                              Icons.arrow_back_ios,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            "Weather",
+                            style: GoogleFonts.montserrat(
+                              color: Colors.white,
+                              fontSize: 28,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      // Search Input
+                      const SizedBox(height: 15),
+                      TextField(
+                        onSubmitted: (value) =>
+                            widget.viewModel.searchNewCity(value),
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: "Search for a city",
+                          hintStyle: const TextStyle(color: Colors.white38),
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            color: Colors.white38,
+                          ),
+                          filled: true,
+                          fillColor: Colors.black26,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                       ),
-                      Text(
-                        "Weather",
-                        style: GoogleFonts.montserrat(
-                          color: Colors.white,
-                          fontSize: 28,
-                        ),
+
+                      // Display temperatures in the list
+                      Expanded(
+                        child: widget.viewModel.isSearchLoading
+                            ? const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              )
+                            : ListView.builder(
+                                padding: const EdgeInsets.only(top: 20),
+                                itemCount: widget.viewModel.searchList.length,
+                                itemBuilder: (context, index) {
+                                  final data =
+                                      widget.viewModel.searchList[index];
+                                  return SearchWeatherCard(
+                                    temp: data.tempC.round().toString(),
+                                    high: data.maxTemp.round().toString(),
+                                    low: data.minTemp.round().toString(),
+                                    city: "${data.cityName}, ${data.cityName}",
+                                    condition: data.condition,
+                                    iconPath: data.hourlyForecast[0].icon,
+                                  );
+                                },
+                              ),
                       ),
                     ],
                   ),
-
-                  // Search Bar
-                  const SizedBox(height: 20),
-                  TextField(
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: "Search for a city",
-                      hintStyle: const TextStyle(color: Colors.white38),
-                      prefixIcon: const Icon(
-                        Icons.search,
-                        color: Colors.white38,
-                      ),
-                      filled: true,
-                      fillColor: Colors.black26,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-
-                  // Weather List
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.only(top: 20),
-                      children: const [
-                        SearchWeatherCard(
-                          temp: "19",
-                          high: "24",
-                          low: "18",
-                          city: "Montreal, Canada",
-                          condition: "Mid Rain",
-                          iconPath: "lib/Assets/Icons/Sun cloud mid rain.png",
-                        ),
-                        SearchWeatherCard(
-                          temp: "20",
-                          high: "21",
-                          low: "-19",
-                          city: "Toronto, Canada",
-                          condition: "Fast Wind",
-                          iconPath: "lib/Assets/Icons/Moon cloud fast wind.png",
-                        ),
-                        SearchWeatherCard(
-                          temp: "13",
-                          high: "16",
-                          low: "8",
-                          city: "Tokyo, Japan",
-                          condition: "Showers",
-                          iconPath:
-                              "lib/Assets/Icons/Sun cloud angled rain.png",
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
