@@ -1,107 +1,137 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:weather_app/Components/WeatherCard.dart';
+import 'package:weather_app/Model/WeatherModel.dart';
+import 'package:weather_app/ViewModel/HomeViewModel.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  final HomeViewModel viewModel = HomeViewModel();
+
+  @override
+  void initState() {
+    super.initState();
+    viewModel.fetchWeather("Cairo");
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF2E335A), // Fallback background color
-      body: Stack(
-        children: [
-          // Background Sky
-          Positioned.fill(
-            child: Image.asset(
-              "lib/Assets/Images/Background Image.png",
-              fit: BoxFit.cover,
-            ),
-          ),
+      backgroundColor: const Color(0xFF2E335A),
+      body: ListenableBuilder(
+        listenable: viewModel,
+        builder: (context, _) {
+          if (viewModel.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.white),
+            );
+          }
 
-          // The House Image
-          Align(
-            alignment: Alignment.topCenter,
-            child: Padding(
-              padding: EdgeInsets.only(
-                top: MediaQuery.of(context).size.height * 0.37,
+          if (viewModel.errorMessage != null) {
+            return Center(
+              child: Text(
+                viewModel.errorMessage!,
+                style: const TextStyle(color: Colors.white),
               ),
-              child: Image.asset(
-                "lib/Assets/Images/House.png",
-                width: MediaQuery.of(context).size.width,
+            );
+          }
+
+          // Use 'weather' instead of 'weatherData'
+          final weather = viewModel.weather;
+          if (weather == null) return const SizedBox();
+
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: Image.asset(
+                  "lib/Assets/Images/Background Image.png",
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-          ),
-
-          // Main Content
-          SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 30),
-                const Text(
-                  "Montreal",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 34,
-                    fontFamily: 'WeatherFont',
+              Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.32,
+                  ),
+                  child: Image.asset(
+                    "lib/Assets/Images/House.png",
+                    width: MediaQuery.of(context).size.width,
                   ),
                 ),
-                const Text(
-                  "19°",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 96,
-                    fontWeight: FontWeight.w200,
-                    fontFamily: 'WeatherFont',
-                  ),
-                ),
-                Text(
-                  "Mostly Clear",
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const Text(
-                  "H:24°  L:18°",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
+              ),
+              SafeArea(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 30),
+                    // Use clean model properties
+                    Text(
+                      weather.cityName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 34,
+                        fontFamily: 'WeatherFont',
+                      ),
+                    ),
+                    Text(
+                      "${weather.tempC.round()}°",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 96,
+                        fontWeight: FontWeight.w200,
+                        fontFamily: 'WeatherFont',
+                        height: 0.9,
+                      ),
+                    ),
+                    Text(
+                      weather.condition,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      "H:${weather.maxTemp.round()}°  L:${weather.minTemp.round()}°",
+                      style: const TextStyle(color: Colors.white, fontSize: 20),
+                    ),
 
-                const Spacer(),
-
-                // Bottom Panel (Reuse the WeatherCard component here)
-                _buildBottomPanel(),
-              ],
-            ),
-          ),
-        ],
+                    const Spacer(),
+                    _buildBottomPanel(weather.hourlyForecast),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildBottomPanel() {
+  Widget _buildBottomPanel(List<HourForecast> hourly) {
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(44)),
       child: BackdropFilter(
-        // This creates the blur effect on the layers behind the container
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
-          height: 300, // Adjust height as needed
+          height: 300,
           width: double.infinity,
           decoration: BoxDecoration(
-            // Semi-transparent purple/blue to match the vibe
             color: const Color(0xFF48319D).withOpacity(0.25),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(44)),
             border: Border.all(
-              color: Colors.white.withOpacity(0.2), // The thin "glass" edge
+              color: Colors.white.withOpacity(0.2),
               width: 1.5,
             ),
           ),
           child: Column(
             children: [
-              // The little handle at the top of the modal
               const SizedBox(height: 10),
               Container(
                 width: 50,
@@ -112,8 +142,6 @@ class HomeView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Forecast Tabs
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 32),
                 child: Row(
@@ -122,14 +150,11 @@ class HomeView extends StatelessWidget {
                     Text(
                       "Hourly Forecast",
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text(
-                      "Weekly Forecast",
-                      style: TextStyle(color: Colors.white38),
-                    ),
+                    Icon(Icons.access_time, color: Colors.white38, size: 18),
                   ],
                 ),
               ),
@@ -139,41 +164,22 @@ class HomeView extends StatelessWidget {
                 indent: 32,
                 endIndent: 32,
               ),
-
-              // Horizontal List
               Expanded(
-                child: ListView(
+                child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   scrollDirection: Axis.horizontal,
-                  children: const [
-                    WeatherCard(
-                      time: "12 AM",
-                      temperature: "19",
-                      icon: "lib/Assets/Icons/Moon cloud fast wind.png",
-                      chanceOfRain: "30%",
-                    ),
-                    WeatherCard(
-                      time: "Now",
-                      temperature: "19",
-                      icon: "lib/Assets/Icons/Moon cloud fast wind.png",
-                      isSelected: true,
-                    ),
-                    WeatherCard(
-                      time: "2 AM",
-                      temperature: "18",
-                      icon: "lib/Assets/Icons/Moon cloud fast wind.png",
-                    ),
-                    WeatherCard(
-                      time: "3 AM",
-                      temperature: "19",
-                      icon: "lib/Assets/Icons/Moon cloud fast wind.png",
-                    ),
-                    WeatherCard(
-                      time: "4 AM",
-                      temperature: "19",
-                      icon: "lib/Assets/Icons/Moon cloud fast wind.png",
-                    ),
-                  ],
+                  itemCount: hourly.length,
+                  itemBuilder: (context, index) {
+                    final hour = hourly[index];
+                    return WeatherCard(
+                      time: hour.time,
+                      temperature: hour.tempC.round().toString(),
+                      icon: hour.icon, // This is now "lib/Assets/Icons/..."
+                      isSelected: index == 0,
+                      // Optional: add logic to show rain % if available in your model
+                      chanceOfRain: index == 0 ? "30%" : null,
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 20),
